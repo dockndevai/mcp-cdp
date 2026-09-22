@@ -1,0 +1,59 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.dockndevai/mcp-cdp",
+  "description": "Safe-by-default MCP that drives an Electron/Chrome app over CDP: DOM, console, network, input.",
+  "repository": {
+    "url": "https://github.com/dockndevai/mcp-cdp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@dockndevai/mcp-cdp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CDP_PORT",
+          "description": "The --remote-debugging-port your app/browser exposes (default 9222).",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CDP_HOST",
+          "description": "Host serving the DevTools endpoint (default 127.0.0.1; non-loopback needs CDP_ALLOW_REMOTE).",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CDP_MODE",
+          "description": "Access mode: read-only | read-write | admin. Starts read-only; interactions need read-write.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CDP_ALLOW_EVAL",
+          "description": "Set true to allow the evaluate tool (arbitrary JS) — admin mode only. Default false.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CDP_TARGET_ALLOWLIST",
+          "description": "Comma-separated URL patterns; interactions are confined to matching targets. Empty = all.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CDP_DRY_RUN",
+          "description": "Set true to log interactions without dispatching them to the browser.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
