@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-09-27
+
+### Added
+- **Optional AI risk guard (laya-guard).** The `evaluate` tool (arbitrary JS in the page) can consult
+  a local [laya-guard](https://github.com/dockndevai/laya-guard) daemon that classifies the expression
+  allow / confirm / block before it runs. Runs *after* the eval gate and can only *tighten*, never
+  grant; fails closed. Off by default (`CDP_GUARD_MODE=monitor|enforce`, `CDP_GUARD_URL`,
+  `CDP_GUARD_TIMEOUT_MS`, `CDP_GUARD_FAIL_CLOSED`).
+
 ## [0.1.0] - 2026-09-22
 
 ### Added

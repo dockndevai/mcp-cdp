@@ -25,7 +25,7 @@ export const adminTools: ToolDef[] = [
         await_promise: z.boolean().optional().describe("Await the expression if it evaluates to a Promise (default false)."),
       },
     },
-    handler: async (args, { client, policy, confirm }) => {
+    handler: async (args, { client, policy, confirm, guard }) => {
       const id = args.target_id as string;
       const expression = args.expression as string;
       const awaitPromise = (args.await_promise as boolean | undefined) ?? false;
@@ -39,6 +39,7 @@ export const adminTools: ToolDef[] = [
       });
       const preview = expression.length > 120 ? `${expression.slice(0, 120)}…` : expression;
       if (dryRun) return textResult(`[dry-run] Would evaluate in ${t.url}: ${preview}`);
+      await guard.enforce({ tool: "evaluate", command: `evaluate JavaScript: ${expression}`, context: t.url }, confirm);
       const ok = await confirm.confirm({ action: "evaluate JavaScript", target: t.url, details: { expression: preview } });
       if (!ok.approved) return textResult(`Evaluation cancelled — ${ok.reason}.`);
       const value = await client.evaluate(id, expression, awaitPromise);

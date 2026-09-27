@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { AppConfig } from "./config.js";
 import { makeConfirmer } from "./elicit.js";
+import { GuardClient, loadGuardConfig } from "./guard.js";
 import { CdpClient, CdpError } from "./cdp/client.js";
 import { PolicyError, SecurityPolicy } from "./security.js";
 import { adminTools } from "./tools/admin.js";
@@ -15,8 +16,9 @@ export function buildServer(config: AppConfig): { server: McpServer; client: Cdp
   const policy = new SecurityPolicy(config.security);
   const client = new CdpClient(config.connection);
 
-  const server = new McpServer({ name: "cdp", version: "0.1.0" });
-  const ctx: ToolContext = { client, policy, confirm: makeConfirmer(server) };
+  const server = new McpServer({ name: "cdp", version: "0.2.0" });
+  const guard = new GuardClient(loadGuardConfig());
+  const ctx: ToolContext = { client, policy, confirm: makeConfirmer(server), guard };
 
   const enabled: string[] = [];
   for (const tool of ALL_TOOLS) {

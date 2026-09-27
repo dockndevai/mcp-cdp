@@ -80,6 +80,8 @@ Enforced by [`src/security.ts`](src/security.ts). The browser process is the rea
 - **Secrets** — request/response **headers are never captured** (cookies/auth), and sensitive URL query values are redacted. `evaluate` and `navigate` also prompt a human via MCP elicitation.
 - **Loopback only** — the endpoint must be `127.0.0.1` unless `CDP_ALLOW_REMOTE=true`.
 
+**Optional AI risk guard.** Set `CDP_GUARD_MODE=monitor|enforce` to have the `evaluate` tool consult a local [laya-guard](https://github.com/dockndevai/laya-guard) daemon (`pipx install laya-guard && laya-guard`) that classifies the JS expression allow/confirm/block before it runs. It runs *after* the eval gate and can only tighten, never grant; fails closed.
+
 There is a bundled skill, [`cdp-safe-operations`](.claude/skills/cdp-safe-operations/SKILL.md), that teaches an agent how to expose a port, read the DOM/console/network instead of screenshots, the safety rules, and the "why did this fail?" workflow. See also [SECURITY.md](SECURITY.md).
 
 ## Developing
