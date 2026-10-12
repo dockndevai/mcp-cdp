@@ -16,7 +16,7 @@ export function buildServer(config: AppConfig): { server: McpServer; client: Cdp
   const policy = new SecurityPolicy(config.security);
   const client = new CdpClient(config.connection);
 
-  const server = new McpServer({ name: "cdp", version: "0.2.0" });
+  const server = new McpServer({ name: "cdp", version: "0.2.1" });
   const guard = new GuardClient(loadGuardConfig());
   const ctx: ToolContext = { client, policy, confirm: makeConfirmer(server), guard };
 

@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-10-12
+
+### Security
+- Bumped `@modelcontextprotocol/sdk` (1.30.0 → 1.32.1) to fix a high-severity advisory where the
+  OAuth client could send credentials to an authorization server chosen by the MCP server
+  ([GHSA-6qxp-vccf-f47h](https://github.com/advisories/GHSA-6qxp-vccf-f47h)), and picked up a
+  transitive `source-map-js` fix for a high-severity event-loop DoS advisory
+  ([GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q)). `npm audit` is clean
+  (0 vulnerabilities).
+
+### Changed
+- Routine patch bumps: `@types/node`, `undici`, `vitest`, `zod` to latest in-range patch releases.
+
 ## [0.2.0] - 2026-09-27
 
 ### Added
