@@ -1,7 +1,7 @@
 {
   "name": "@dockndevai/mcp-cdp",
   "mcpName": "io.github.dockndevai/mcp-cdp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Model Context Protocol server that drives an Electron/Chrome app over the DevTools Protocol (CDP) — DOM, console, network, click/type/navigate and gated JS eval — safe by default, cross-OS.",
   "type": "module",
   "license": "MIT",
@@ -46,13 +46,13 @@
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "undici": "^8.10.2",
-    "zod": "^4.6.5"
+    "undici": "^8.12.2",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.1",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.5"
   }
 }
