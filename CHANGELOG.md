@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-10-26
+
+### Security
+- `npm audit fix` cleared a high-severity `body-parser` DoS advisory ([GHSA-27r3-jxmh-p828], 2.3.0 → 2.4.0) and moderate advisories in `fast-uri` ([GHSA-w74x-v6f9-j3xg] and related, 3.1.8 → 3.1.9), `hono` ([GHSA-5r4p-p66f-jhc7], 4.13.8 → 4.13.14), and `ip-address` ([GHSA-rxp7-6hxx-x8q5], 10.7.2 → 10.7.5). `npm audit` now reports 0 vulnerabilities.
+
+### Changed
+- Routine in-range patch bumps: `@modelcontextprotocol/sdk` (1.32.1 → 1.32.2), `undici` (8.12.2 → 8.12.3). No behavior change.
+
+[GHSA-27r3-jxmh-p828]: https://github.com/advisories/GHSA-27r3-jxmh-p828
+[GHSA-w74x-v6f9-j3xg]: https://github.com/advisories/GHSA-w74x-v6f9-j3xg
+[GHSA-5r4p-p66f-jhc7]: https://github.com/advisories/GHSA-5r4p-p66f-jhc7
+[GHSA-rxp7-6hxx-x8q5]: https://github.com/advisories/GHSA-rxp7-6hxx-x8q5
+
 ## [0.2.2] - 2026-10-19
 
 ### Changed
