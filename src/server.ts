@@ -16,9 +16,14 @@ export function buildServer(config: AppConfig): { server: McpServer; client: Cdp
   const policy = new SecurityPolicy(config.security);
   const client = new CdpClient(config.connection);
 
-  const server = new McpServer({ name: "cdp", version: "0.2.5" });
+  const server = new McpServer({ name: "cdp", version: "0.3.0" });
   const guard = new GuardClient(loadGuardConfig());
-  const ctx: ToolContext = { client, policy, confirm: makeConfirmer(server), guard };
+  const confirmer = makeConfirmer(server, {
+    name: "mcp-cdp",
+    requireHuman: config.security.requireHumanApproval,
+    audit: config.security.auditLog,
+  });
+  const ctx: ToolContext = { client, policy, confirm: confirmer, guard };
 
   const enabled: string[] = [];
   for (const tool of ALL_TOOLS) {
@@ -29,7 +34,9 @@ export function buildServer(config: AppConfig): { server: McpServer; client: Cdp
       { ...tool.config, annotations: annotationsFor(tool) },
       async (args: Record<string, unknown>) => {
         try {
-          return await tool.handler(args ?? {}, ctx);
+          // Every approval prompt in this call (incl. laya-guard's) is bound to this tool + these exact arguments.
+          const callCtx: ToolContext = { ...ctx, confirm: confirmer.forCall(tool.name, args ?? {}) };
+          return await tool.handler(args ?? {}, callCtx);
         } catch (err) {
           return toErrorResult(err);
         }

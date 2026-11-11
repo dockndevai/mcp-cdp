@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ToolDef } from "./types.js";
+import { redactUrl, targetVersionOf } from "../cdp/client.js";
 import { textResult } from "./types.js";
 
 const targetId = z.string().describe("Target id from list_targets.");
@@ -96,8 +97,20 @@ export const writeTools: ToolDef[] = [
       // Scope on the DESTINATION url — that is what we're moving to.
       const { dryRun } = policy.guard({ tool: "navigate", capability: "write", target: url, destructive: true });
       if (dryRun) return textResult(`[dry-run] Would navigate target ${id} to ${url}.`);
-      const ok = await confirm.confirm({ action: "navigate the page", target: url });
+      // Pin the page being navigated (CDP target id + current URL) across the prompt, so an approval to move
+      // one page to `url` cannot be applied to a different page, or to the same tab after the app moved it.
+      const current = await client.findTarget(id);
+      const ok = await confirm.confirm({
+        action: "navigate the page",
+        target: url,
+        details: { target_id: id, from: redactUrl(current.url) },
+        probe: () => client.targetVersion(id),
+      });
       if (!ok.approved) return textResult(`Navigation cancelled — ${ok.reason}.`);
+      // The "from" page shown to the human must be the page the version was pinned on.
+      if (ok.receipt.version !== targetVersionOf(current)) {
+        return textResult("Navigation cancelled — the page changed before the approval prompt was shown; retry.");
+      }
       await client.navigate(id, url);
       return textResult(`Navigated target ${id} to ${url}.`);
     },

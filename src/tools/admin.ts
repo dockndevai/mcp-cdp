@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ToolDef } from "./types.js";
+import { redactUrl, targetVersionOf } from "../cdp/client.js";
 import { jsonResult, textResult } from "./types.js";
 
 /**
@@ -40,8 +41,21 @@ export const adminTools: ToolDef[] = [
       const preview = expression.length > 120 ? `${expression.slice(0, 120)}…` : expression;
       if (dryRun) return textResult(`[dry-run] Would evaluate in ${t.url}: ${preview}`);
       await guard.enforce({ tool: "evaluate", command: `evaluate JavaScript: ${expression}`, context: t.url }, confirm);
-      const ok = await confirm.confirm({ action: "evaluate JavaScript", target: t.url, details: { expression: preview } });
+      // The prompt shows the exact expression (in the bound arguments) and its fingerprint. The probe pins the
+      // page it runs against (CDP target id + URL): if the app navigated or replaced the page while the human
+      // was deciding, the approval is void rather than executing against a page nobody approved.
+      const ok = await confirm.confirm({
+        action: "evaluate JavaScript",
+        target: redactUrl(t.url),
+        details: { target_id: id },
+        probe: () => client.targetVersion(id),
+      });
       if (!ok.approved) return textResult(`Evaluation cancelled — ${ok.reason}.`);
+      // The allowlist / protected-target checks above ran against `t.url`. The version pinned for the prompt must be
+      // that same page, otherwise it moved (e.g. while laya-guard or the human was deciding) after those checks.
+      if (ok.receipt.version !== targetVersionOf(t)) {
+        return textResult("Evaluation cancelled — the page changed after the target policy check; call list_targets and retry.");
+      }
       const value = await client.evaluate(id, expression, awaitPromise);
       return jsonResult({ value });
     },

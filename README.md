@@ -77,7 +77,9 @@ Enforced by [`src/security.ts`](src/security.ts). The browser process is the rea
 - **`CDP_PROTECTED_TARGETS`** — targets that can be **inspected but never interacted with**. Defaults protect sign-in pages (`accounts.google.com`, `login.microsoftonline.com`, …) and browser internals (`chrome://`, `devtools://`, extensions).
 - **`CDP_ALLOW_EVAL`** — `evaluate` is arbitrary code execution in the renderer: admin mode **plus** this flag, refused on protected targets, with a human confirmation.
 - **`CDP_DRY_RUN`** — interactions log their intent and return without dispatching.
-- **Secrets** — request/response **headers are never captured** (cookies/auth), and sensitive URL query values are redacted. `evaluate` and `navigate` also prompt a human via MCP elicitation.
+- **Interactive confirmation** — `evaluate` and `navigate` prompt a human via MCP elicitation before running. The prompt shows the tool, the exact arguments (the full expression / destination URL) and a fingerprint; the target page's identity (CDP target id + URL) is pinned across the prompt and the action is refused if the page was replaced or navigated meanwhile; a prompt nobody answers is a refusal.
+- **`CDP_REQUIRE_HUMAN_APPROVAL`** (default `false`) — when `true`, `evaluate` and `navigate` are **refused** if the client cannot elicit (instead of falling back to the mode / `CDP_ALLOW_EVAL` gates alone).
+- **Secrets** — request/response **headers are never captured** (cookies/auth), and sensitive URL query values are redacted.
 - **Loopback only** — the endpoint must be `127.0.0.1` unless `CDP_ALLOW_REMOTE=true`.
 
 **Optional AI risk guard.** Set `CDP_GUARD_MODE=monitor|enforce` to have the `evaluate` tool consult a local [laya-guard](https://github.com/dockndevai/laya-guard) daemon (`pipx install laya-guard && laya-guard`) that classifies the JS expression allow/confirm/block before it runs. It runs *after* the eval gate and can only tighten, never grant; fails closed.

@@ -20,6 +20,13 @@ least it needs.
 - **`evaluate` is code execution.** Running arbitrary JavaScript in the page is effectively RCE in the
   renderer. It requires `admin` mode **and** `CDP_ALLOW_EVAL=true`, is refused for protected targets,
   and prompts a human to confirm via MCP elicitation. Keep it off unless you need it.
+- **Require a human for `evaluate` and `navigate`.** Set `CDP_REQUIRE_HUMAN_APPROVAL=true` so they are
+  refused when the client cannot show an approval prompt. Each approval is bound to the exact tool and
+  arguments (the full expression / destination URL, with a fingerprint) and to the target page's identity
+  (CDP target id + URL): if the page was replaced or navigated while the human was deciding, the action
+  is refused. In-page changes that keep the same URL are not detected. Approval receipts are written to
+  the audit log (`"audit":"approval"`, with `approvedBy` = `human` or `flag-only`). `click`, `type_text`
+  and `press_key` do not prompt.
 - **Preview with dry-run.** `CDP_DRY_RUN=true` makes interactions log their intent and return without
   dispatching anything to the browser.
 - **Secrets are not returned.** Request/response **headers are never captured** (they carry cookies
