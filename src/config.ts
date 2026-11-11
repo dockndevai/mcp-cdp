@@ -97,6 +97,7 @@ export function loadConfig(): AppConfig {
       allowEval: bool("CDP_ALLOW_EVAL", false),
       dryRun: bool("CDP_DRY_RUN", false),
       auditLog: bool("CDP_AUDIT_LOG", true),
+      requireHumanApproval: bool("CDP_REQUIRE_HUMAN_APPROVAL", false),
     },
   };
 }

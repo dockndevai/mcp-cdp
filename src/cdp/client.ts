@@ -8,6 +8,7 @@
  * Secret hygiene: request/response **headers are never stored** (they carry cookies and auth), and
  * sensitive-looking URL query values are redacted before anything reaches the model.
  */
+import { createHash } from "node:crypto";
 import { WebSocket } from "undici";
 import type { Connection } from "../config.js";
 import { endpointUrl } from "../config.js";
@@ -68,6 +69,11 @@ export function redactUrl(raw: string): string {
   } catch {
     return raw;
   }
+}
+
+/** The pinned identity of a target: CDP target id + URL (see `CdpClient.targetVersion`). */
+export function targetVersionOf(t: Pick<CdpTarget, "id" | "url">): string {
+  return createHash("sha256").update(`${t.id}\n${t.url}`).digest("hex").slice(0, 12);
 }
 
 function truncate(s: string, max = 2000): string {
@@ -304,6 +310,20 @@ export class CdpClient {
     const t = (await this.listTargets()).find((x) => x.id === targetId);
     if (!t) throw new CdpError(`No target with id '${targetId}'. Call list_targets to see current ids.`);
     return t;
+  }
+
+  /**
+   * Version token for the TARGET an approval was given for, pinned across the approval prompt: a hash of
+   * the CDP target id and its current URL. Both are stable while the page sits still, so an approval for
+   * one page cannot execute against a different page (a replaced tab, or the app navigating elsewhere
+   * while the human decides). Deliberately NOT included: title, DOM, console/network counters or any
+   * other state that changes on its own. Limits: it does not see same-URL changes (in-page state, a
+   * reload, navigating away and back), and an SPA that rewrites its own URL while the prompt is open
+   * (hash/route change) makes the approval fail closed. Returns undefined if the target no longer exists.
+   */
+  async targetVersion(targetId: string): Promise<string | undefined> {
+    const t = (await this.listTargets()).find((x) => x.id === targetId);
+    return t ? targetVersionOf(t) : undefined;
   }
 
   /** Attach (or reuse an attachment) to a target; the session buffers console/network from now on. */

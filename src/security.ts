@@ -24,6 +24,8 @@ export interface SecurityConfig {
   /** Perform interactions in dry-run: log the intent, never dispatch it to the browser. */
   dryRun: boolean;
   auditLog: boolean;
+  /** Refuse destructive ops that no human can approve (no elicitation support) instead of trusting the flags alone. */
+  requireHumanApproval: boolean;
 }
 
 export class PolicyError extends Error {

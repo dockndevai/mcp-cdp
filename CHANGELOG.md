@@ -4,6 +4,28 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-11-11
+
+### Security
+- **Approval no longer fails open on timeout.** The human-approval prompt used the MCP SDK's default
+  60 s request timeout, and a timeout fell through to "approved" (the mode / `CDP_ALLOW_EVAL` gates had
+  already passed). A prompt nobody answered therefore auto-approved `evaluate` / `navigate`. A timeout is
+  now a refusal, and the wait defaults to 5 minutes.
+
+### Added
+- **Approvals are bound to the exact action.** The prompt shows the tool, the full (secret-redacted)
+  arguments (the whole `expression` / destination `url`) and a fingerprint; every approval and refusal is
+  written to the audit log as `"audit":"approval"` with the fingerprint, resource version and
+  `approvedBy` (`human` / `flag-only`).
+- **Approvals are bound to the target page.** `evaluate` and `navigate` read a version token (a hash of the
+  CDP target id + URL) before the prompt and again after the human answers, and refuse if it changed — the
+  page was replaced, or the app navigated elsewhere. `evaluate` additionally refuses if the pinned page is
+  not the page the allowlist / protected-target checks ran against. Title and other volatile state are not
+  part of the token.
+- `CDP_REQUIRE_HUMAN_APPROVAL=true` — refuse `evaluate` / `navigate` when the client cannot elicit.
+
+Tracking issue: https://github.com/dockndevai/mcp-core/issues/1
+
 ## [0.2.5] - 2026-11-09
 
 ### Changed
